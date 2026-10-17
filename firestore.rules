@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // demo prototype: signed-in (anonymous) users can read and write marketplace data
+    match /shops/{shopId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+    match /requests/{requestId} {
+      allow read, create, update: if request.auth != null;
+      allow delete: if false;
+      match /events/{eventId} {
+        allow read, create: if request.auth != null;
+        allow update, delete: if false;
+      }
+    }
+  }
+}

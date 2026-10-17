@@ -1,0 +1,192 @@
+[
+  {
+    "name": "Monginis Cake Corner",
+    "category": "bakery",
+    "area": "Andheri West, Mumbai",
+    "address": "Shop 3, Crystal Plaza, SV Road, Andheri West, Mumbai 400058",
+    "persona": { "style": "Premium quality, polite, rarely discounts but offers freebies", "flexibility": "low" },
+    "items": [
+      { "name": "1kg eggless chocolate truffle cake", "basePrice": 550, "floorPrice": 470, "leadTimeHours": 3, "tags": ["eggless", "chocolate", "cake"] },
+      { "name": "1kg black forest cake", "basePrice": 500, "floorPrice": 430, "leadTimeHours": 3, "tags": ["cake"] },
+      { "name": "photo print cake 1kg", "basePrice": 750, "floorPrice": 650, "leadTimeHours": 6, "tags": ["cake", "custom"] }
+    ]
+  },
+  {
+    "name": "Sharma Sweets & Bakery",
+    "category": "bakery",
+    "area": "Andheri East, Mumbai",
+    "address": "12, Old Nagardas Road, Andheri East, Mumbai 400069",
+    "persona": { "style": "Aggressive discounter, chatty, hates losing a customer to competitors", "flexibility": "high" },
+    "items": [
+      { "name": "1kg eggless chocolate cake", "basePrice": 480, "floorPrice": 400, "leadTimeHours": 4, "tags": ["eggless", "chocolate", "cake"] },
+      { "name": "500g pineapple pastry box", "basePrice": 250, "floorPrice": 200, "leadTimeHours": 1, "tags": ["pastry"] },
+      { "name": "1kg motichoor ladoo", "basePrice": 420, "floorPrice": 360, "leadTimeHours": 1, "tags": ["sweets"] }
+    ]
+  },
+  {
+    "name": "Theobroma Patisserie",
+    "category": "bakery",
+    "area": "Lokhandwala, Mumbai",
+    "address": "Unit 7, Lokhandwala Market, Andheri West, Mumbai 400053",
+    "persona": { "style": "Upmarket, firm on price, emphasises ingredients and brand", "flexibility": "low" },
+    "items": [
+      { "name": "1kg Belgian chocolate cake (eggless on request)", "basePrice": 680, "floorPrice": 620, "leadTimeHours": 5, "tags": ["eggless", "chocolate", "cake", "premium"] },
+      { "name": "brownie box of 6", "basePrice": 450, "floorPrice": 420, "leadTimeHours": 1, "tags": ["brownie"] }
+    ]
+  },
+  {
+    "name": "Dawat Home Bakers",
+    "category": "bakery",
+    "area": "Versova, Mumbai",
+    "address": "B-204, Sagar Society, Yari Road, Versova, Mumbai 400061",
+    "persona": { "style": "Small home baker, flexible on price, slower delivery, very warm", "flexibility": "high" },
+    "items": [
+      { "name": "1kg eggless chocolate cake (homemade)", "basePrice": 430, "floorPrice": 350, "leadTimeHours": 6, "tags": ["eggless", "chocolate", "cake", "homemade"] },
+      { "name": "cupcake box of 12", "basePrice": 360, "floorPrice": 300, "leadTimeHours": 5, "tags": ["cupcake"] }
+    ]
+  },
+  {
+    "name": "Wellness Forever Pharmacy",
+    "category": "pharmacy",
+    "area": "Andheri West, Mumbai",
+    "address": "Ground Floor, Veera Desai Road, Andheri West, Mumbai 400058",
+    "persona": { "style": "Professional chain store, fixed discounts only, fast delivery", "flexibility": "low" },
+    "items": [
+      { "name": "digital thermometer", "basePrice": 320, "floorPrice": 280, "leadTimeHours": 1, "tags": ["device"] },
+      { "name": "BP monitor (Omron)", "basePrice": 2200, "floorPrice": 1950, "leadTimeHours": 1, "tags": ["device"] },
+      { "name": "vitamin D3 60k sachets (pack of 8)", "basePrice": 400, "floorPrice": 350, "leadTimeHours": 1, "tags": ["supplement"] }
+    ]
+  },
+  {
+    "name": "Gupta Medical Stores",
+    "category": "pharmacy",
+    "area": "Andheri East, Mumbai",
+    "address": "5, Sahar Road, Opp. Railway Station, Andheri East, Mumbai 400069",
+    "persona": { "style": "Old-school family shop, negotiates like a bazaar veteran, loyal-customer discounts", "flexibility": "medium" },
+    "items": [
+      { "name": "digital thermometer", "basePrice": 290, "floorPrice": 240, "leadTimeHours": 2, "tags": ["device"] },
+      { "name": "BP monitor (Dr Morepen)", "basePrice": 1800, "floorPrice": 1550, "leadTimeHours": 3, "tags": ["device"] },
+      { "name": "glucometer kit with 25 strips", "basePrice": 1100, "floorPrice": 950, "leadTimeHours": 2, "tags": ["device"] }
+    ]
+  },
+  {
+    "name": "Apna Medico",
+    "category": "pharmacy",
+    "area": "Versova, Mumbai",
+    "address": "Shop 2, Seven Bungalows Circle, Versova, Mumbai 400061",
+    "persona": { "style": "Young energetic owner, matches online pharmacy prices, quick on WhatsApp", "flexibility": "high" },
+    "items": [
+      { "name": "digital thermometer", "basePrice": 300, "floorPrice": 230, "leadTimeHours": 1, "tags": ["device"] },
+      { "name": "BP monitor (Omron)", "basePrice": 2100, "floorPrice": 1800, "leadTimeHours": 2, "tags": ["device"] },
+      { "name": "nebulizer machine", "basePrice": 1500, "floorPrice": 1300, "leadTimeHours": 2, "tags": ["device"] }
+    ]
+  },
+  {
+    "name": "Croma Express",
+    "category": "electronics",
+    "area": "Andheri West, Mumbai",
+    "address": "Infiniti Mall, Link Road, Andheri West, Mumbai 400053",
+    "persona": { "style": "Big retail chain, price-matches competitors but never goes below cost, formal", "flexibility": "medium" },
+    "items": [
+      { "name": "boAt Airdopes 141 earbuds", "basePrice": 1400, "floorPrice": 1250, "leadTimeHours": 2, "tags": ["audio", "earbuds"] },
+      { "name": "USB-C 65W charger", "basePrice": 1600, "floorPrice": 1400, "leadTimeHours": 2, "tags": ["charger"] },
+      { "name": "32GB pendrive (SanDisk)", "basePrice": 450, "floorPrice": 400, "leadTimeHours": 1, "tags": ["storage"] }
+    ]
+  },
+  {
+    "name": "Mobile Zone Repairs & Accessories",
+    "category": "electronics",
+    "area": "Andheri East, Mumbai",
+    "address": "Kiosk 9, Chakala Market, Andheri East, Mumbai 400093",
+    "persona": { "style": "Street-smart local dealer, starts high, drops fast when buyer pushes", "flexibility": "high" },
+    "items": [
+      { "name": "boAt Airdopes 141 earbuds", "basePrice": 1500, "floorPrice": 1150, "leadTimeHours": 1, "tags": ["audio", "earbuds"] },
+      { "name": "tempered glass + cover combo", "basePrice": 500, "floorPrice": 300, "leadTimeHours": 1, "tags": ["accessory"] },
+      { "name": "USB-C 65W charger (local brand)", "basePrice": 900, "floorPrice": 650, "leadTimeHours": 1, "tags": ["charger"] }
+    ]
+  },
+  {
+    "name": "Digital Point",
+    "category": "electronics",
+    "area": "Versova, Mumbai",
+    "address": "Shop 11, Versova Link Road, Mumbai 400061",
+    "persona": { "style": "Calm veteran, honest about stock, small fixed discounts, great service reputation", "flexibility": "medium" },
+    "items": [
+      { "name": "boAt Airdopes 141 earbuds", "basePrice": 1450, "floorPrice": 1280, "leadTimeHours": 2, "tags": ["audio", "earbuds"] },
+      { "name": "wireless mouse (Logitech)", "basePrice": 750, "floorPrice": 650, "leadTimeHours": 1, "tags": ["accessory"] },
+      { "name": "32GB pendrive (SanDisk)", "basePrice": 420, "floorPrice": 380, "leadTimeHours": 1, "tags": ["storage"] }
+    ]
+  },
+  {
+    "name": "Venus Stationery Mart",
+    "category": "stationery",
+    "area": "Andheri West, Mumbai",
+    "address": "21, Four Bungalows Market, Andheri West, Mumbai 400053",
+    "persona": { "style": "Bulk-order specialist, sharp pencil on big quantities, brisk", "flexibility": "medium" },
+    "items": [
+      { "name": "A4 copier paper ream (500 sheets)", "basePrice": 280, "floorPrice": 240, "leadTimeHours": 2, "tags": ["paper"] },
+      { "name": "spiral notebooks pack of 10", "basePrice": 350, "floorPrice": 290, "leadTimeHours": 2, "tags": ["notebook"] },
+      { "name": "art supplies starter kit", "basePrice": 650, "floorPrice": 550, "leadTimeHours": 4, "tags": ["art"] }
+    ]
+  },
+  {
+    "name": "Krishna Book Depot",
+    "category": "stationery",
+    "area": "Versova, Mumbai",
+    "address": "Shop 4, Yari Road Junction, Versova, Mumbai 400061",
+    "persona": { "style": "Quiet uncle-run shop, fair prices, small discounts for students", "flexibility": "medium" },
+    "items": [
+      { "name": "A4 copier paper ream (500 sheets)", "basePrice": 260, "floorPrice": 230, "leadTimeHours": 3, "tags": ["paper"] },
+      { "name": "geometry box (Camlin)", "basePrice": 180, "floorPrice": 150, "leadTimeHours": 1, "tags": ["school"] },
+      { "name": "art supplies starter kit", "basePrice": 600, "floorPrice": 520, "leadTimeHours": 5, "tags": ["art"] }
+    ]
+  },
+  {
+    "name": "Student Corner",
+    "category": "stationery",
+    "area": "Andheri East, Mumbai",
+    "address": "Near Tolani College Gate, Andheri East, Mumbai 400093",
+    "persona": { "style": "Fast-talking, competes hard on price, throws in freebies for bulk", "flexibility": "high" },
+    "items": [
+      { "name": "A4 copier paper ream (500 sheets)", "basePrice": 270, "floorPrice": 235, "leadTimeHours": 1, "tags": ["paper"] },
+      { "name": "exam pad + pens combo", "basePrice": 150, "floorPrice": 110, "leadTimeHours": 1, "tags": ["school"] },
+      { "name": "spiral notebooks pack of 10", "basePrice": 330, "floorPrice": 270, "leadTimeHours": 1, "tags": ["notebook"] }
+    ]
+  },
+  {
+    "name": "New Bharat Kirana",
+    "category": "general",
+    "area": "Andheri East, Mumbai",
+    "address": "8, JB Nagar Market, Andheri East, Mumbai 400059",
+    "persona": { "style": "Classic kirana uncle, knows every customer, negotiates on bundles not single items", "flexibility": "medium" },
+    "items": [
+      { "name": "5kg basmati rice (Daawat)", "basePrice": 650, "floorPrice": 580, "leadTimeHours": 1, "tags": ["grocery", "rice"] },
+      { "name": "cooking oil 1L (Fortune)", "basePrice": 160, "floorPrice": 145, "leadTimeHours": 1, "tags": ["grocery", "oil"] },
+      { "name": "monthly grocery combo (rice, dal, oil, atta)", "basePrice": 1800, "floorPrice": 1600, "leadTimeHours": 2, "tags": ["grocery", "combo"] }
+    ]
+  },
+  {
+    "name": "Versova Super Store",
+    "category": "general",
+    "area": "Versova, Mumbai",
+    "address": "Plot 14, Versova Village Road, Mumbai 400061",
+    "persona": { "style": "Modern mini-mart, fixed MRP mostly, free fast delivery above a threshold", "flexibility": "low" },
+    "items": [
+      { "name": "5kg basmati rice (India Gate)", "basePrice": 680, "floorPrice": 640, "leadTimeHours": 1, "tags": ["grocery", "rice"] },
+      { "name": "cooking oil 1L (Saffola)", "basePrice": 180, "floorPrice": 170, "leadTimeHours": 1, "tags": ["grocery", "oil"] },
+      { "name": "cleaning essentials kit", "basePrice": 450, "floorPrice": 420, "leadTimeHours": 1, "tags": ["household"] }
+    ]
+  },
+  {
+    "name": "Lokhandwala General Stores",
+    "category": "general",
+    "area": "Lokhandwala, Mumbai",
+    "address": "Shop 6, Lokhandwala Back Road, Andheri West, Mumbai 400053",
+    "persona": { "style": "Friendly brothers-run shop, rounds off bills, loves regular customers", "flexibility": "high" },
+    "items": [
+      { "name": "5kg basmati rice (local brand)", "basePrice": 600, "floorPrice": 520, "leadTimeHours": 1, "tags": ["grocery", "rice"] },
+      { "name": "atta 5kg (Aashirvaad)", "basePrice": 260, "floorPrice": 235, "leadTimeHours": 1, "tags": ["grocery", "atta"] },
+      { "name": "tea 500g (Red Label)", "basePrice": 290, "floorPrice": 260, "leadTimeHours": 1, "tags": ["grocery", "tea"] }
+    ]
+  }
+]
