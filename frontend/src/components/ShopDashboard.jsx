@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { collection, collectionGroup, getDocs, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { db } from '../firebase'
+import { answerDemand } from '../agents/demand'
 
 // read-only view of a shop agent's negotiations ("Ramesh wakes up to this")
 export default function ShopDashboard({ defaultShopId }) {
@@ -73,7 +74,7 @@ export default function ShopDashboard({ defaultShopId }) {
                   : 'border-slate-800 bg-slate-900/60'
               }`}
             >
-              <div>
+              <div className="flex-1">
                 <p className="font-medium">
                   {a.outcome === 'won' && '🏆 Order won'}
                   {a.outcome === 'lost' && '❌ Lost the deal'}
@@ -83,6 +84,9 @@ export default function ShopDashboard({ defaultShopId }) {
                   {a.price > 0 && <span className="text-amber-300"> · ₹{a.price}</span>}
                 </p>
                 {a.lastMessage && <p className="text-xs text-slate-400 mt-1">"{a.lastMessage}"</p>}
+                {a.outcome === 'dropout' && a.missedItem && (
+                  <AnswerBox shopId={shopId} neededItem={a.missedItem} />
+                )}
               </div>
               <span className="text-[10px] text-slate-500 shrink-0">{a.rounds} turn{a.rounds > 1 ? 's' : ''}</span>
             </div>
@@ -90,6 +94,58 @@ export default function ShopDashboard({ defaultShopId }) {
           </div>
         </>
       )}
+    </div>
+  )
+}
+
+// lazy onboarding: the agent asks, the owner answers once, the catalog grows forever
+function AnswerBox({ shopId, neededItem }) {
+  const [reply, setReply] = useState('')
+  const [state, setState] = useState('idle') // idle | working | done
+  const [result, setResult] = useState(null)
+
+  async function submit() {
+    if (!reply.trim() || state === 'working') return
+    setState('working')
+    try {
+      const res = await answerDemand(shopId, neededItem, reply)
+      setResult(res)
+      setState('done')
+    } catch {
+      setState('idle')
+    }
+  }
+
+  if (state === 'done') {
+    return (
+      <p className={`text-xs mt-2 ${result?.added ? 'text-emerald-300' : 'text-slate-400'}`}>
+        {result?.added ? '✅ ' : ''}{result?.confirmation}
+        {result?.added && <span className="text-slate-400"> Your agent can now offer this in future negotiations.</span>}
+      </p>
+    )
+  }
+
+  return (
+    <div className="mt-2 bg-slate-950/60 border border-amber-500/20 rounded-lg p-2.5">
+      <p className="text-xs text-amber-200 mb-1.5">
+        🙋 Your agent asks: can you supply <span className="font-semibold">{neededItem}</span>? Tell it once — it remembers forever.
+      </p>
+      <div className="flex gap-2">
+        <input
+          value={reply}
+          onChange={(e) => setReply(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && submit()}
+          placeholder='e.g. "haan, I can order it, 1350 rupees, ready next day"'
+          className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-amber-400"
+        />
+        <button
+          onClick={submit}
+          disabled={state === 'working'}
+          className="text-xs bg-amber-400 text-slate-950 font-semibold px-3 rounded-lg hover:bg-amber-300 disabled:opacity-50 whitespace-nowrap"
+        >
+          {state === 'working' ? 'Teaching…' : 'Tell your agent'}
+        </button>
+      </div>
     </div>
   )
 }

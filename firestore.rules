@@ -5,7 +5,9 @@ service cloud.firestore {
     match /shops/{shopId} {
       allow read: if request.auth != null;
       allow create: if request.auth != null;
-      allow update, delete: if false;
+      // lazy onboarding: owners teach their agent new catalog items
+      allow update: if request.auth != null;
+      allow delete: if false;
     }
     match /requests/{requestId} {
       allow read, create, update: if request.auth != null;
