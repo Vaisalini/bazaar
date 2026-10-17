@@ -22,6 +22,11 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 
+# Submission working files (not part of the code repo)
+*.pptx
+build-deck.ps1
+DECK_CONTENT.md
+
 # Firebase
 .firebase/
 firebase-debug.log
