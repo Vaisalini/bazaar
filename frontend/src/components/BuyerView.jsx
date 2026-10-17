@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { collection, doc, onSnapshot, orderBy, query } from 'firebase/firestore'
+import { collection, doc, getCountFromServer, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { db } from '../firebase'
 import { runRequest } from '../agents/orchestrator'
 import ShopCard from './ShopCard'
@@ -20,7 +20,19 @@ export default function BuyerView() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [stalled, setStalled] = useState(false)
+  const [stats, setStats] = useState(null)
   const speech = useSpeech(setText)
+
+  // live marketplace stats for the landing
+  useEffect(() => {
+    if (requestId) return
+    Promise.all([
+      getCountFromServer(collection(db, 'shops')),
+      getCountFromServer(query(collection(db, 'requests'), where('status', '==', 'completed'))),
+    ])
+      .then(([s, d]) => setStats({ shops: s.data().count, deals: d.data().count }))
+      .catch(() => {})
+  }, [requestId])
 
   // live negotiation stream from Firestore
   useEffect(() => {
@@ -85,6 +97,12 @@ export default function BuyerView() {
               </span>
             ))}
           </div>
+          {stats && (
+            <p className="text-xs text-slate-500 mt-4">
+              🏪 <span className="text-amber-300 font-semibold">{stats.shops}</span> shop agents online · 🤝{' '}
+              <span className="text-amber-300 font-semibold">{stats.deals}</span> deals closed on Bazaar
+            </p>
+          )}
         </div>
       )}
 
@@ -186,7 +204,8 @@ function WinnerBanner({ deal }) {
   const readyBy = new Date(Date.now() + (deal.etaHours || 2) * 3600e3)
   const readyStr = readyBy.toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })
   return (
-    <div className="winner-shimmer border border-amber-400/50 rounded-2xl p-5 mb-6 animate-fade-up shadow-xl shadow-amber-500/10">
+    <div className="relative winner-shimmer border border-amber-400/50 rounded-2xl p-5 mb-6 animate-fade-up shadow-xl shadow-amber-500/10 overflow-hidden">
+      <Confetti />
       <div className="flex items-center justify-between mb-2">
         <p className="text-amber-300 text-xs font-semibold uppercase tracking-wider">🏆 Deal closed — order confirmed</p>
         {deal.orderId && (
@@ -233,6 +252,26 @@ function TicketField({ label, value }) {
     <div className="bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-2">
       <p className="text-slate-500 uppercase tracking-wider text-[9px]">{label}</p>
       <p className="text-slate-200 mt-0.5">{value}</p>
+    </div>
+  )
+}
+
+const CONFETTI_COLORS = ['#fbbf24', '#f97316', '#34d399', '#818cf8', '#f472b6']
+function Confetti() {
+  return (
+    <div className="absolute inset-0 pointer-events-none" aria-hidden>
+      {Array.from({ length: 28 }).map((_, i) => (
+        <span
+          key={i}
+          className="confetti-piece"
+          style={{
+            left: `${(i * 37) % 100}%`,
+            background: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+            animationDelay: `${(i % 10) * 0.12}s`,
+            animationDuration: `${1.6 + (i % 5) * 0.3}s`,
+          }}
+        />
+      ))}
     </div>
   )
 }

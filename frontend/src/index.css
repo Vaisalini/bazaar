@@ -57,6 +57,19 @@
 .typing-dot:nth-child(2) { animation-delay: 0.15s; }
 .typing-dot:nth-child(3) { animation-delay: 0.3s; }
 
+@keyframes confettiFall {
+  0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(160px) rotate(540deg); opacity: 0; }
+}
+.confetti-piece {
+  position: absolute;
+  top: -8px;
+  width: 7px;
+  height: 11px;
+  border-radius: 2px;
+  animation: confettiFall 2s ease-in forwards;
+}
+
 .bg-mesh {
   background-image:
     radial-gradient(ellipse 60% 40% at 20% 0%, rgba(251, 191, 36, 0.07), transparent),

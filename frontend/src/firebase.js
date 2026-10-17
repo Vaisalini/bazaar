@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, signInAnonymously } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check'
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check'
 
 export const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -10,12 +10,12 @@ export const app = initializeApp({
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 })
 
-// App Check: fixed debug token in dev (register it once in Firebase console); reCAPTCHA in production
+// App Check: fixed debug token in dev (register it once in Firebase console); reCAPTCHA Enterprise in production
 if (import.meta.env.DEV) {
   self.FIREBASE_APPCHECK_DEBUG_TOKEN = import.meta.env.VITE_APPCHECK_DEBUG_TOKEN || true
 }
 initializeAppCheck(app, {
-  provider: new ReCaptchaV3Provider(
+  provider: new ReCaptchaEnterpriseProvider(
     import.meta.env.VITE_RECAPTCHA_SITE_KEY || 'placeholder-debug-only-key'
   ),
   isTokenAutoRefresh: true,

@@ -15,5 +15,9 @@ service cloud.firestore {
         allow update, delete: if false;
       }
     }
+    // collection-group reads for the shopkeeper activity feed
+    match /{path=**}/events/{eventId} {
+      allow read: if request.auth != null;
+    }
   }
 }

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { onboardMessage } from '../agents/onboard'
 import { MicButton, useSpeech } from './MicButton'
+import ShopDashboard from './ShopDashboard'
+
+const SAMPLE_SHOP =
+  'My shop is Royal Bakery in Andheri West. We make fresh cakes and pastries daily. 1kg chocolate cake is 450 rupees, eggless 480. Photo cakes are 700 but need one day notice. Pastries 60 rupees each. We can deliver nearby for orders above 500.'
 
 const WELCOME =
   "Namaste! 🙏 I'm your Bazaar agent. Tell me about your shop — what's it called, what do you sell, and your usual prices? You can write in English, Hindi, or Hinglish."
@@ -11,6 +15,7 @@ export default function OnboardChat() {
   const [busy, setBusy] = useState(false)
   const [busySecs, setBusySecs] = useState(0)
   const [shop, setShop] = useState(null)
+  const [myShopId, setMyShopId] = useState('')
   const speech = useSpeech(setInput)
 
   useEffect(() => {
@@ -29,6 +34,7 @@ export default function OnboardChat() {
       const res = await onboardMessage(next)
       if (res.done) {
         setShop(res.profile)
+        setMyShopId(res.shopId)
         setMessages([
           ...next,
           {
@@ -94,6 +100,15 @@ export default function OnboardChat() {
         </button>
       </div>
 
+      {!shop && messages.length === 1 && (
+        <button
+          onClick={() => setInput(SAMPLE_SHOP)}
+          className="mt-3 text-xs bg-slate-900/80 border border-slate-700 rounded-full px-4 py-2 text-slate-300 hover:border-emerald-400 hover:text-emerald-200 transition-all"
+        >
+          ✨ Try an example shop (fills the message — just press Send)
+        </button>
+      )}
+
       {shop && (
         <div className="mt-6 bg-slate-900 border border-emerald-500/40 rounded-xl p-4 text-sm">
           <p className="text-emerald-300 font-semibold mb-2">Your agent's understanding of your shop:</p>
@@ -107,6 +122,8 @@ export default function OnboardChat() {
           </ul>
         </div>
       )}
+
+      <ShopDashboard defaultShopId={myShopId} />
     </div>
   )
 }
