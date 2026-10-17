@@ -15,7 +15,7 @@ export default function App() {
     <div className="min-h-screen bg-slate-950 text-slate-100 bg-mesh relative overflow-x-hidden">
       <div className="orb w-72 h-72 bg-amber-500/10 -top-20 -left-20" />
       <div className="orb w-96 h-96 bg-indigo-500/10 top-40 -right-32" style={{ animationDelay: '-4s' }} />
-      <header className="relative border-b border-slate-800/80 backdrop-blur px-6 py-4 flex items-center justify-between">
+      <header className="relative border-b border-slate-800/80 backdrop-blur px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-center gap-3 sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-slate-950 text-xl font-black shadow-lg shadow-amber-500/20">
             B
@@ -27,9 +27,9 @@ export default function App() {
             <p className="text-[11px] text-slate-400">The agent-to-agent commerce network for local shops</p>
           </div>
         </div>
-        <nav className="flex gap-1 bg-slate-900/80 border border-slate-800 rounded-xl p-1">
+        <nav className="flex gap-1 bg-slate-900/80 border border-slate-800 rounded-xl p-1 w-full sm:w-auto justify-center">
           <TabButton active={tab === 'buyer'} onClick={() => setTab('buyer')}>
-            🛍️ Shop with your agent
+            🛍️ Shop
           </TabButton>
           <TabButton active={tab === 'shop'} onClick={() => setTab('shop')}>
             🏪 I'm a shopkeeper

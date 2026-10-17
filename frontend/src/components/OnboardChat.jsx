@@ -94,7 +94,7 @@ export default function OnboardChat() {
         <button
           onClick={send}
           disabled={busy}
-          className="bg-emerald-500 text-slate-950 font-semibold px-6 rounded-xl hover:bg-emerald-400 disabled:opacity-50"
+          className="bg-emerald-500 text-slate-950 font-semibold px-6 rounded-xl hover:bg-emerald-400 disabled:opacity-50 whitespace-nowrap"
         >
           Send
         </button>

@@ -61,8 +61,10 @@ export default function ShopDashboard({ defaultShopId }) {
           No negotiations yet for this shop — send a matching request from the buyer tab and watch this feed update live.
         </p>
       ) : (
-        <div className="flex flex-col gap-2">
-          {activity.map((a) => (
+        <>
+          <Insights activity={activity} />
+          <div className="flex flex-col gap-2">
+            {activity.map((a) => (
             <div
               key={a.reqId}
               className={`animate-fade-up rounded-xl border px-4 py-3 text-sm flex items-start justify-between gap-3 ${
@@ -84,8 +86,33 @@ export default function ShopDashboard({ defaultShopId }) {
               </div>
               <span className="text-[10px] text-slate-500 shrink-0">{a.rounds} turn{a.rounds > 1 ? 's' : ''}</span>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function Insights({ activity }) {
+  const won = activity.filter((a) => a.outcome === 'won')
+  const lost = activity.filter((a) => a.outcome === 'lost').length
+  const missed = activity.filter((a) => a.outcome === 'dropout').length
+  const revenue = won.reduce((s, a) => s + (a.price || 0), 0)
+  return (
+    <div className="flex flex-wrap gap-2 mb-3 text-xs">
+      <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-full px-3 py-1.5">
+        🏆 {won.length} won{revenue > 0 && ` · ₹${revenue} earned`}
+      </span>
+      {lost > 0 && (
+        <span className="bg-slate-900 border border-slate-700 text-slate-300 rounded-full px-3 py-1.5">
+          ❌ {lost} lost on price/terms
+        </span>
+      )}
+      {missed > 0 && (
+        <span className="bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-full px-3 py-1.5">
+          💡 {missed} request{missed > 1 ? 's' : ''} you couldn't serve — nearby demand you're missing
+        </span>
       )}
     </div>
   )

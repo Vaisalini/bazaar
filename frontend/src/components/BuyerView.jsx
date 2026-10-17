@@ -23,6 +23,15 @@ export default function BuyerView() {
   const [stats, setStats] = useState(null)
   const speech = useSpeech(setText)
 
+  // permalink: restore a negotiation from ?r=<requestId> (survives refresh, shareable)
+  useEffect(() => {
+    const r = new URLSearchParams(window.location.search).get('r')
+    if (r) setRequestId(r)
+  }, [])
+  useEffect(() => {
+    if (!need && request?.parsed) setNeed(request.parsed)
+  }, [request, need])
+
   // live marketplace stats for the landing
   useEffect(() => {
     if (requestId) return
@@ -65,6 +74,7 @@ export default function BuyerView() {
       const res = await runRequest(queryText)
       setNeed(res.need)
       setRequestId(res.requestId)
+      window.history.replaceState(null, '', `?r=${res.requestId}`)
     } catch {
       setError('The agents are in high demand right now — give it a few seconds and try again.')
     } finally {
@@ -80,7 +90,7 @@ export default function BuyerView() {
       {!requestId && (
         <div className="text-center py-12 animate-fade-up">
           <p className="text-xs uppercase tracking-[0.3em] text-amber-400/80 mb-4">agent-to-agent commerce</p>
-          <h2 className="text-5xl font-black mb-4 leading-tight">
+          <h2 className="text-4xl sm:text-5xl font-black mb-4 leading-tight">
             One sentence.{' '}
             <span className="bg-gradient-to-r from-amber-300 via-amber-400 to-orange-500 bg-clip-text text-transparent">
               Your agent does the rest.
@@ -106,7 +116,7 @@ export default function BuyerView() {
         </div>
       )}
 
-      <div className="flex gap-2 max-w-3xl mx-auto">
+      <div className="flex flex-col sm:flex-row gap-2 max-w-3xl mx-auto">
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -114,14 +124,16 @@ export default function BuyerView() {
           placeholder="e.g. I need a 1kg eggless chocolate cake under ₹500 by 6pm…"
           className="flex-1 bg-slate-900/90 border border-slate-700 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:border-amber-400 focus:shadow-lg focus:shadow-amber-500/10 transition-shadow"
         />
-        <MicButton supported={speech.supported} state={speech.state} seconds={speech.seconds} onClick={() => speech.toggle(text)} />
-        <button
-          onClick={() => text.trim() && start(text)}
-          disabled={loading}
-          className="bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 font-bold px-6 rounded-xl hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-lg shadow-amber-500/20"
-        >
-          {loading ? 'Dispatching…' : 'Send agent →'}
-        </button>
+        <div className="flex gap-2 justify-end">
+          <MicButton supported={speech.supported} state={speech.state} seconds={speech.seconds} onClick={() => speech.toggle(text)} />
+          <button
+            onClick={() => text.trim() && start(text)}
+            disabled={loading}
+            className="bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 font-bold px-6 py-3 rounded-xl hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-lg shadow-amber-500/20 whitespace-nowrap"
+          >
+            {loading ? 'Dispatching…' : 'Send agent →'}
+          </button>
+        </div>
       </div>
 
       {!requestId && (
@@ -188,6 +200,8 @@ export default function BuyerView() {
                 setText('')
                 setEvents([])
                 setRequest(null)
+                setNeed(null)
+                window.history.replaceState(null, '', window.location.pathname)
               }}
               className="text-sm text-slate-400 hover:text-amber-400"
             >
