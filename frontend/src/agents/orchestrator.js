@@ -140,6 +140,7 @@ async function runNegotiation(requestId, need, shops) {
         await logEvent(requestId, {
           shopId: shop.id, shopName: shop.name, shopArea: shop.area, near: !!shop.near,
           round, actor: 'shop', type: 'dropout', message: turn.message,
+          neededItem: need.item || '',
         })
       } else {
         const floor = findFloor(shop, turn.itemName)

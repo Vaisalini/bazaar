@@ -97,8 +97,9 @@ export default function ShopDashboard({ defaultShopId }) {
 function Insights({ activity }) {
   const won = activity.filter((a) => a.outcome === 'won')
   const lost = activity.filter((a) => a.outcome === 'lost').length
-  const missed = activity.filter((a) => a.outcome === 'dropout').length
+  const missed = activity.filter((a) => a.outcome === 'dropout')
   const revenue = won.reduce((s, a) => s + (a.price || 0), 0)
+  const missedItems = [...new Set(missed.map((a) => a.missedItem).filter(Boolean))].slice(0, 3)
   return (
     <div className="flex flex-wrap gap-2 mb-3 text-xs">
       <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 rounded-full px-3 py-1.5">
@@ -109,9 +110,10 @@ function Insights({ activity }) {
           ❌ {lost} lost on price/terms
         </span>
       )}
-      {missed > 0 && (
+      {missed.length > 0 && (
         <span className="bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-full px-3 py-1.5">
-          💡 {missed} request{missed > 1 ? 's' : ''} you couldn't serve — nearby demand you're missing
+          💡 {missed.length} request{missed.length > 1 ? 's' : ''} you couldn't serve
+          {missedItems.length > 0 && <> — customers wanted: {missedItems.join(', ')}. Consider stocking it!</>}
         </span>
       )}
     </div>
@@ -122,6 +124,7 @@ function summarize(reqId, events) {
   // events arrive newest-first
   const types = events.map((e) => e.type)
   const offer = events.find((e) => e.type === 'offer')
+  const dropout = events.find((e) => e.type === 'dropout')
   const outcome = types.includes('accept')
     ? 'won'
     : types.includes('reject')
@@ -132,7 +135,8 @@ function summarize(reqId, events) {
   return {
     reqId,
     outcome,
-    itemName: offer?.itemName || '',
+    itemName: offer?.itemName || dropout?.neededItem || '',
+    missedItem: dropout?.neededItem || '',
     price: offer?.price || 0,
     rounds: events.length,
     lastMessage: events[0]?.message || '',
