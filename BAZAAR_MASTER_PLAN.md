@@ -112,7 +112,7 @@ The theme asks for solutions addressing *"discovery, personalization, conversati
 ### 4.1 Technical Merit & Gen AI Implementation — 40% (our strongest suit)
 - **Meaningful Gen AI:** Gen AI is not a feature here — it *is* the product. Remove Gemini and nothing remains: intent parsing, shop-knowledge extraction, persona-conditioned negotiation, multilingual conversation, and deal summarization are all generative reasoning tasks. This answers the rubric question *"does Gen AI contribute directly to solving the problem?"* with: it is the entire mechanism.
 - **Technical implementation:** Real multi-agent orchestration (parallel negotiations with state), function calling (inventory/price-floor checks), structured output (offers as JSON), real-time streaming UI (Firestore listeners), deployed serverless backend.
-- **Scalability & sustainability:** Serverless end-to-end (Cloud Run autoscaling + Firestore + Firebase Hosting). Adding a shop = adding a Firestore document + agent config, no code. Clear path beyond prototype: WhatsApp Business API for real shopkeeper onboarding, voice (IVR) channel, payments.
+- **Scalability & sustainability:** Serverless end-to-end (Firebase Hosting + Firestore + Firebase AI Logic), with a containerized **Cloud Run orchestrator** included in the repo (`backend/`) as the production scale-out path. Adding a shop = adding a Firestore document + agent config, no code. Clear path beyond prototype: WhatsApp Business API for real shopkeeper onboarding, voice (IVR) channel, payments.
 
 ### 4.2 Problem Alignment & Impact — 25%
 - Pitch framing: **"90% of Indian retail is invisible to the internet. Shopkeepers lose customers every day to quick-commerce — not because they're worse, but because they can't answer. Bazaar gives 13 million shops a voice."**
@@ -131,31 +131,32 @@ The theme asks for solutions addressing *"discovery, personalization, conversati
 
 ## 5. Architecture & Required Tech Utilization
 
+> **As built:** fully Firebase-native, zero-billing stack. The client app orchestrates agents through **Firebase AI Logic** (Firebase's Gemini SDK with a managed, App Check-protected key); Firestore is both system of record and real-time transport. A containerized **Cloud Run orchestrator** ships in `backend/` as the production architecture for scale (server-side orchestration, WhatsApp webhooks, payments).
+
 ```mermaid
 flowchart LR
-    U[Customer - Web App] -->|request| H[Firebase Hosting + Auth]
-    H --> CR[Cloud Run - Agent Orchestrator]
-    CR -->|intent parsing| G[Gemini API]
-    CR -->|spawn N parallel negotiations| SA[Shop Agents - Gemini w/ function calling]
-    SA -->|inventory & price-floor lookups| FS[(Firestore)]
-    CR -->|negotiation events| FS
-    FS -->|onSnapshot real-time stream| U
-    SK[Shopkeeper - Onboarding Chat] --> CR
-    CR -->|structured shop profile| FS
+    U[Customer - Web App] -->|one sentence, text or voice| O[Agent Orchestrator - frontend/src/agents]
+    SK[Shopkeeper - Onboarding Chat/Voice] --> O
+    H[Firebase Hosting + Anonymous Auth + App Check] --- U
+    O -->|intent parsing, negotiation turns, transcription| AI[Firebase AI Logic -> Gemini]
+    O -->|shops, requests, negotiation events| FS[(Firestore)]
+    FS -->|onSnapshot live stream| U
+    CR[Cloud Run orchestrator - backend/, production path] -.scale-out roadmap.-> FS
 ```
 
 ### Exactly where each mandated tool is used
 
 | Tool | Role in Bazaar |
 |---|---|
-| **Gemini** | (1) Buyer intent → structured query (JSON mode). (2) Each shop agent's negotiation turns — persona-conditioned, with **function calling** to check inventory/price floors in Firestore. (3) Shopkeeper onboarding: free-form chat → structured shop profile. (4) Deal summary + negotiation transcript explanation. (5) Multilingual handling throughout. Model: `gemini-2.x-flash` for negotiation turns (fast/cheap), `pro` tier for intent parsing if needed. |
-| **Firestore** | System of record: `shops` (profiles, inventory, price floors, personas), `requests` (buyer queries), `negotiations` (every bid/counter/accept as an event document — this event log *is* what the UI streams live via `onSnapshot`), `deals` (closed outcomes). |
-| **Cloud Run** | The **agent orchestrator** service (Node.js/Express or Python/FastAPI): receives buyer request → calls Gemini for intent → selects matching shops → runs N parallel negotiation loops (buyer agent ↔ shop agents, multi-round) → writes every event to Firestore → closes the best deal. Deployed with `min-instances=1` so judges never hit a cold start. |
-| **Firebase Hosting** | Serves the React web app (public prototype URL for submission). |
+| **Gemini** (via **Firebase AI Logic**) | (1) Buyer intent → structured query (JSON schema output). (2) Persona-conditioned agent-to-agent negotiation turns — shop agents + buyer agent, multi-round, with price floors and budget guards enforced in code. (3) Shopkeeper onboarding: free-form chat → structured shop profile. (4) Voice-note transcription (audio understanding). (5) Deal summaries. Model fallback chain (`gemini-3.8-flash` → older flash/flash-lite) for quota resilience. |
+| **Firestore** | System of record **and** real-time transport: `shops` (profiles, inventory, price floors, personas), `requests` (buyer queries + final deal/order ticket), `requests/{id}/events` (every bid/counter/accept as an event document — the UI streams this live via `onSnapshot` to render the negotiation theatre). |
+| **Firebase Hosting** | Serves the app (public prototype URL for submission). |
 | **Firebase Auth** | Anonymous sign-in — judges use the app instantly with zero registration. |
+| **Firebase App Check** | Protects the Gemini endpoint (reCAPTCHA v3 in production, debug provider in dev) — mandatory for AI Logic from Nov 2026, already enforced. |
+| **Cloud Run** | Production architecture in `backend/`: containerized Node.js orchestrator (Dockerfile included) for server-side negotiation at scale, WhatsApp Business API webhooks, and payment flows — the documented scale-out path beyond the prototype. |
 
 > **Brief-description sentence (use verbatim in the submission form):**
-> *"Bazaar is deployed on Firebase Hosting with anonymous Firebase Auth; all shop profiles, inventories, and live negotiation event streams live in Firestore (the UI streams negotiations in real time via snapshot listeners); the multi-agent orchestrator — which parses buyer intent, spawns parallel shop-agent negotiations, and closes deals — runs as a Cloud Run service; and Gemini powers every intelligent step: intent parsing, conversational shop onboarding, persona-conditioned agent-to-agent negotiation with function calling, and deal summarization."*
+> *"Bazaar is deployed on Firebase Hosting with anonymous Firebase Auth and App Check; all shop profiles, inventories, and live negotiation event streams live in Firestore (the UI streams every bid and counter in real time via snapshot listeners); Gemini — accessed through Firebase AI Logic — powers every intelligent step: buyer-intent parsing, conversational/voice shop onboarding, persona-conditioned agent-to-agent negotiation with structured outputs, voice-note transcription, and deal summarization; and the repo includes a containerized Cloud Run orchestrator (backend/ with Dockerfile) as the production scale-out architecture."*
 
 ---
 
@@ -164,15 +165,15 @@ flowchart LR
 Honest scoping so the prototype is impressive *and* finishable:
 
 **Real (fully functional):**
-- Buyer request → intent parsing → parallel multi-round agent negotiations → best-deal selection → live streaming UI. (The core loop — 100% real Gemini calls.)
-- Shopkeeper onboarding chat → structured shop profile written to Firestore → that shop immediately participates in negotiations.
-- Deal summary with full negotiation transcript.
+- Buyer request (text or **voice note transcribed by Gemini**) → intent parsing → parallel multi-round agent negotiations → best-deal selection → live streaming UI → **order ticket** (order ID, fulfillment pickup/delivery, shop address + Maps link, ready-by time, pay-at-handover terms). 100% real Gemini calls.
+- Shopkeeper onboarding chat/voice → structured shop profile written to Firestore → that shop immediately participates in negotiations (verified: a chatted-in shop joined, and honestly dropped out when it couldn't fulfil — agents respect their own inventory).
+- Location-aware matching: buyer location parsed → nearby shops ranked first with "📍 near you" badges.
 
 **Seeded (and openly labeled as demo data):**
-- 8–12 pre-created shops in one locality ("Andheri, Mumbai") with distinct personalities (aggressive discounter, premium-quality, slow-but-cheap), realistic inventories, and price floors — covering 3–4 categories: bakery, pharmacy, electronics, stationery.
-- No real payments, no real WhatsApp integration (shown as "production roadmap" in deck). The shopkeeper chat UI *simulates* the WhatsApp channel.
+- 16 pre-created shops in Andheri/Versova/Lokhandwala with distinct personalities (aggressive discounter, premium brand, home baker, kirana veteran…), realistic inventories, price floors, and street addresses — across 5 categories: bakery, pharmacy, electronics, stationery, general/kirana.
+- No real payments (pay-at-handover recorded on the ticket), no real WhatsApp integration — the chat UI simulates the WhatsApp channel; both are roadmap items.
 
-**Out of scope (roadmap slide only):** real WhatsApp Business API, payments/escrow, delivery logistics, maps-based radius matching, voice calls to shops.
+**Out of scope (roadmap slide only):** WhatsApp Business API, UPI deep links/escrow, courier API integration, geo-radius queries (geohash), photo/claim-your-shop/lazy onboarding.
 
 ---
 
@@ -181,7 +182,7 @@ Honest scoping so the prototype is impressive *and* finishable:
 ### Phase 0 — Setup (Day 1)
 - [ ] `git init` (local only — repo pushed from personal laptop at the end via zip transfer)
 - [ ] Personal Google account: create GCP project, enable Gemini API, create Firebase project (Hosting, Auth, Firestore)
-- [ ] Scaffold: `frontend/` (React + Vite + Tailwind), `backend/` (Cloud Run service), `seed/` (shop seeding script)
+- [ ] Scaffold: `frontend/` (React + Vite + Tailwind), `backend/` (Cloud Run production reference), `seed/` (shop seeding script)
 - [ ] `.env` for Gemini API key; `.gitignore` covers all secrets from commit #1
 
 ### Phase 1 — Data & seed (Day 1–2)
@@ -204,9 +205,8 @@ Honest scoping so the prototype is impressive *and* finishable:
 - [ ] Shopkeeper view: onboarding chat + "my agent's activity" feed (inquiries, deals won/lost, insights)
 
 ### Phase 4 — Deploy & harden (Day 8–10)
-- [ ] Backend → Cloud Run (`min-instances=1`, env-var secrets via Secret Manager)
-- [ ] Frontend → Firebase Hosting; anonymous Auth enabled
-- [ ] Firestore security rules (public read of demo data, writes only via backend)
+- [ ] Frontend → Firebase Hosting; anonymous Auth + App Check (reCAPTCHA v3) enabled
+- [ ] Firestore security rules (authenticated reads; no client deletes)
 - [ ] Load sanity-check; confirm Gemini quota/billing can survive weeks of judge traffic
 - [ ] End-to-end test from an incognito browser + a phone (judge simulation: cold visitor, no context)
 
@@ -229,8 +229,8 @@ Rule from organizers: video must *clearly demonstrate working functionality* or 
 | 0:25–0:45 | **Idea:** "Bazaar gives every shop an AI agent — and gives you one too. Your agent negotiates with theirs. Watch." |
 | 0:45–2:15 | **Core demo (the money shot):** type/speak one sentence → split-screen negotiation theatre → 6 shop agents bidding and countering live → deal closes → winning summary with transcript. Narrate what's happening. |
 | 2:15–2:50 | **Supply side:** shopkeeper onboards a brand-new shop via casual chat (in Hinglish) → show the structured profile appear → re-run a query → **the new shop participates and wins a deal.** (Proves the two-sided network is real.) |
-| 2:50–3:20 | **Proof of deployment:** 10-second flash of Cloud Run service, Firestore data, Firebase console. "Live right now at [URL] — try it yourself." |
-| 3:20–3:45 | **Scale close:** "13 million shops already have the only hardware they need — a phone. Bazaar is the missing commerce layer. Built on Gemini, Firestore, Cloud Run, Firebase." |
+| 2:50–3:20 | **Proof of deployment:** 10-second flash of the Firebase console — Firestore live events, AI Logic, Hosting. "Live right now at [URL] — try it yourself." |
+| 3:20–3:45 | **Scale close:** "13 million shops already have the only hardware they need — a phone. Bazaar is the missing commerce layer. Built on Gemini, Firestore, and Firebase." |
 
 ---
 
@@ -241,7 +241,7 @@ Rule from organizers: video must *clearly demonstrate working functionality* or 
 3. **Insight** — Gen AI deleted onboarding friction: shops need an agent, not an app
 4. **Solution** — two-sided agent network; one-sentence shopping; 5-minute shop onboarding
 5. **Live demo screenshots** — negotiation theatre + deal screen
-6. **Architecture** — diagram from section 5; name-check Gemini/Firestore/Cloud Run/Firebase explicitly
+6. **Architecture** — diagram from section 5; name-check Gemini (Firebase AI Logic)/Firestore/Firebase explicitly, with Cloud Run (`backend/`) as the scale path
 7. **Why Gen AI is essential** (aimed at the 40% criterion) — the product *is* generative reasoning
 8. **Impact** — local economies, inclusion (any language, no typing), shopkeeper insights
 9. **Scalability & roadmap** — WhatsApp Business API, voice/IVR, payments, serverless scale-out
@@ -253,7 +253,7 @@ Rule from organizers: video must *clearly demonstrate working functionality* or 
 
 | Risk | Mitigation |
 |---|---|
-| Prototype down during async evaluation (instant fail per rules) | Cloud Run `min-instances=1`; Firebase Hosting (static, never down); error boundaries everywhere; uptime check + alert; test from incognito/phone |
+| Prototype down during async evaluation (instant fail per rules) | Firebase Hosting (static, effectively never down); client-side orchestration = no server to crash; Gemini model fallback chain for quota; error boundaries + stall watchdog everywhere; test from incognito/phone |
 | Gemini quota/billing exhausted by judge traffic | Flash model for negotiation turns; cap rounds per request; rate-limit per session; monitor billing alerts |
 | Negotiation output flaky/nonsensical | Structured JSON outputs with schema validation; price floors enforced in *code* (function calling results), not just prompts; max-round cutoffs; rehearsed seeded scenarios |
 | Judge confusion (cold visitor) | Landing explainer + one-click sample queries; demo-data reset; no sign-up (anonymous auth) |
@@ -269,7 +269,7 @@ Rule from organizers: video must *clearly demonstrate working functionality* or 
 - [ ] Video 3:00–4:00, public YouTube/Vimeo/Drive link, shows working functionality end-to-end
 - [ ] Deployed prototype URL — publicly accessible, tested from a device/network outside our own
 - [ ] Public GitHub repo with source + README + architecture
-- [ ] Brief description including **Firebase, Firestore, Cloud Run, Gemini** usage (section 5 verbatim sentence)
+- [ ] Brief description including **Firebase, Firestore, Cloud Run, Gemini** usage (section 5 verbatim sentence — covers all four: Firebase/Firestore/Gemini as deployed, Cloud Run as the included production architecture)
 - [ ] Category clearly stated: **Retail & Commerce: Intelligent Customer and Business Experiences**
 - [ ] All materials in English
 - [ ] Every link re-verified from an incognito window on submission day
