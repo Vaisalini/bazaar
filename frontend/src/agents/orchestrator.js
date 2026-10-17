@@ -209,6 +209,7 @@ function pickBestDeal(outcomes) {
   if (!deals.length) return null
   deals.sort((a, b) => a.lastOffer.price - b.lastOffer.price)
   const best = deals[0]
+  const openingPrice = best.transcript.find((t) => t.actor === 'shop' && t.price)?.price || best.lastOffer.price
   return {
     orderId: 'BZR-' + Math.random().toString(36).slice(2, 7).toUpperCase(),
     shopId: best.shop.id,
@@ -217,6 +218,8 @@ function pickBestDeal(outcomes) {
     shopAddress: best.shop.address || best.shop.area,
     itemName: best.lastOffer.itemName,
     price: best.lastOffer.price,
+    openingPrice,
+    savings: Math.max(0, openingPrice - best.lastOffer.price),
     etaHours: best.lastOffer.etaHours,
     fulfillment: best.lastOffer.fulfillment || 'pickup',
     payment: 'Pay at handover — cash or shop UPI QR',

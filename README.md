@@ -49,6 +49,12 @@ Customer / Shopkeeper (React + Vite, Firebase Hosting)
 - **Firebase Hosting + Auth + App Check** serve and protect the app.
 - `backend/` contains the **Cloud Run production architecture** (containerized Node.js orchestrator, Dockerfile included) — the path for scaling beyond the free-tier prototype: server-side orchestration, WhatsApp Business API webhooks, payments.
 
+### A note on agent isolation (honest engineering trade-off)
+
+In this free-tier prototype, each negotiation **round** is batched: one Gemini call produces every shop agent's move (each conditioned on its own persona, inventory, and private price floor), and one call produces the buyer agent's reactions. This fits the Gemini free tier's rate limits (~5 req/min) while preserving identical agent semantics — per-agent state, personas, and floors are maintained in the orchestrator, and floors/budgets are enforced **in code**, never trusted to the model.
+
+The `backend/` Cloud Run orchestrator implements the same state machine with **fully isolated per-agent calls** (one model context per shop), which is the production deployment: it also moves price floors server-side so buyers' clients never see them. Batching is a deployment optimization, not a capability claim.
+
 ## 🚀 Run it locally
 
 Prereqs: Node 20+, a Firebase project (Spark plan is enough) with **Firestore**, **Anonymous Auth**, and **AI Logic (Gemini Developer API)** enabled.

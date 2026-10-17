@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { collection, doc, getCountFromServer, onSnapshot, orderBy, query, where } from 'firebase/firestore'
+import { collection, doc, getCountFromServer, getDocs, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore'
 import { db } from '../firebase'
 import { runRequest } from '../agents/orchestrator'
 import ShopCard from './ShopCard'
@@ -35,12 +35,16 @@ export default function BuyerView() {
   // live marketplace stats for the landing
   useEffect(() => {
     if (requestId) return
-    Promise.all([
-      getCountFromServer(collection(db, 'shops')),
-      getCountFromServer(query(collection(db, 'requests'), where('status', '==', 'completed'))),
-    ])
-      .then(([s, d]) => setStats({ shops: s.data().count, deals: d.data().count }))
-      .catch(() => {})
+    ;(async () => {
+      try {
+        const [s, dealsSnap] = await Promise.all([
+          getCountFromServer(collection(db, 'shops')),
+          getDocs(query(collection(db, 'requests'), where('status', '==', 'completed'), limit(100))),
+        ])
+        const saved = dealsSnap.docs.reduce((sum, d) => sum + (d.data().deal?.savings || 0), 0)
+        setStats({ shops: s.data().count, deals: dealsSnap.size, saved })
+      } catch { /* stats are decorative */ }
+    })()
   }, [requestId])
 
   // live negotiation stream from Firestore
@@ -110,7 +114,12 @@ export default function BuyerView() {
           {stats && (
             <p className="text-xs text-slate-500 mt-4">
               🏪 <span className="text-amber-300 font-semibold">{stats.shops}</span> shop agents online · 🤝{' '}
-              <span className="text-amber-300 font-semibold">{stats.deals}</span> deals closed on Bazaar
+              <span className="text-amber-300 font-semibold">{stats.deals}</span> deals closed
+              {stats.saved > 0 && (
+                <>
+                  {' '}· 💰 <span className="text-emerald-300 font-semibold">₹{stats.saved}</span> saved by buyer agents
+                </>
+              )}
             </p>
           )}
         </div>
@@ -231,6 +240,12 @@ function WinnerBanner({ deal }) {
       <p className="text-lg font-semibold">
         {deal.itemName} from {deal.shopName} — ₹{deal.price}
       </p>
+      {deal.savings > 0 && (
+        <p className="text-sm text-emerald-300 mt-1">
+          💰 Opening quote ₹{deal.openingPrice} → your agent closed at ₹{deal.price} —{' '}
+          <span className="font-bold">you saved ₹{deal.savings}</span> without saying a word.
+        </p>
+      )}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3 text-xs">
         <TicketField label="Fulfillment" value={deal.fulfillment === 'delivery' ? '🚚 Shop delivers to you' : '🏬 Pickup at shop'} />
         <TicketField label="Ready by" value={`~${readyStr} (${deal.etaHours}h)`} />

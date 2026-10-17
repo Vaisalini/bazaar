@@ -315,3 +315,23 @@ The landscape:
 - **Field onboarding:** one person with a phone onboards a shop in 5 minutes — the onboarding chat in the prototype is the proof
 - **WhatsApp-native in production:** the shop installs nothing; their agent lives on the number they already have
 - For the prototype, say it honestly: demo uses seeded shops + simulated WhatsApp-style chat; production rides the WhatsApp Business API. Judges respect a clear "here's what's demo, here's the path to real."
+
+### Q5. "Why not Zepto/Blinkit/Zomato/Swiggy?" (the sharpened version)
+**"Food has Zomato. Groceries have Blinkit. The other ₹40 lakh crore of local commerce — hardware, medical equipment, stationery, tailoring, repairs — has a phone that nobody answers. Bazaar answers it."**
+- **Catalog apps sell SKUs; Bazaar sells conversations.** A dark store stocks a standard cake; it cannot stock "1kg photo cake with my daughter's picture, eggless, by 4 PM" — made-to-order and negotiated purchases have no SKU.
+- **Kill test (use it live):** name the app for *"a ¾-inch brass elbow joint, today, nearby"* or *"a nebulizer at 11 PM under ₹1,500 from a shop within 2 km."* There isn't one. Today's solution is Google Maps + five unanswered calls.
+- **Depth:** dark store = ~8K SKUs; a market street = lakhs of undocumented long-tail items. Catalog apps *architecturally* can't index them; a conversation network doesn't need to.
+- **Geography:** dark-store economics stop at ~50–60 dense cities. 4,000+ Indian towns have zero dark stores and full shop streets. Bazaar needs no warehouse or fleet — it starts where their map ends.
+- **Side of the table:** those apps are built by disintermediating shops. Bazaar exists to arm them. Swiggy Genie runs *past* the shop; Bazaar's agent *is* the shop.
+
+### Q6. "Isn't this a race to the bottom for shopkeepers?"
+Floors are owner-set and **enforced in code, not prompts** — agents can't sell below them. And our own transcripts show agents winning on speed, delivery, and trust, not just price (Gupta won the nebulizer at ₹1,370 when a competitor offered the same-day item at ₹1,500 — but also when cheaper options existed elsewhere, shops won on terms). Negotiation ≠ undercutting; it's matching terms to what this customer values.
+
+### Q7. "Cold start — why does shop #1 join?"
+The shop agent is valuable **standalone**, before any buyer network exists: it answers 100% of inquiries 24/7, captures missed calls, and reports missed demand ("3 people wanted photo cakes — you don't make them"). The marketplace is the second act; the employee-that-never-sleeps is the first.
+
+### Q8. "What stops a buyer from bypassing Bazaar after the first deal?"
+The agent is the lock-in, not the listing: order history, repeat/standing orders, negotiation leverage ("you're a regular — agents get you regular-customer pricing"), and insights live on Bazaar. The shop also prefers the agent channel — it answers when he's cutting pipe.
+
+### Q9. "The browser knows the shops' floor prices" / "one Gemini call plays all shop agents"
+True in the prototype, and deliberately so — see the README's "note on agent isolation": batching rounds into single calls fits the free tier while preserving per-agent personas, state, and code-enforced floors. The `backend/` Cloud Run orchestrator (in the repo, with Dockerfile) implements fully isolated per-agent calls and moves floors server-side — that's the production deployment. Batching is a deployment optimization, not a capability claim. **Say this before the judge finds it.**
