@@ -1,5 +1,7 @@
 # Bazaar 🛍️
 
+### 🔴 Live demo: **[bazaar-5cbf8.web.app](https://bazaar-5cbf8.web.app)** · no sign-up, just type a request
+
 **The agent-to-agent commerce network for local shops.**
 
 90% of Indian retail is offline and invisible to the internet — 13 million shops with no catalogs, no apps, no digital presence. Bazaar gives every shop an AI agent that learns the business *through conversation* (text or voice note), and gives every customer a buyer agent that discovers, queries, and **negotiates with all of them in parallel** — closing the best deal in about a minute.
